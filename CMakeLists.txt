@@ -6,6 +6,7 @@ project(ycsbc)
 
 #3. specify c++ compiler version
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -pthread -fgnu-tm")
 
 #4. head file path
 include_directories(
@@ -16,19 +17,41 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/third_party/googletest/googletest/include
 )
 
+#5. third path link path
 link_directories(
-  ${PROJECT_SOURCE_DIR}/third_party/yaml-cpp/build/*.a
-  ${PROJECT_SOURCE_DIR}/third_party/googletest/build/lib/*.a
+  ${PROJECT_SOURCE_DIR}/third_party/yaml-cpp/build/
+  ${PROJECT_SOURCE_DIR}/third_party/googletest/build/lib/
 )
 
-#5. source code file path
-file(GLOB SRC
+#6. source code file path
+file(GLOB SOURCE_FILE
   ${PROJECT_SOURCE_DIR}/ycsbc.cc
   ${PROJECT_SOURCE_DIR}/core/*.cc
   ${PROJECT_SOURCE_DIR}/db/*.cc
 )
-MESSAGE(test "dddd" ${SRC})
-#6. define the executable
-add_executable(${PROJECT_NAME} ${SRC})
 
+#7. define the executable
+add_executable(${PROJECT_NAME} ${SOURCE_FILE})
 target_link_libraries(${PROJECT_NAME} pthread )
+
+#8. define gtest path
+set(GTEST_LIBRARY ${PROJECT_SOURCE_DIR}/third_party/googletest/build/lib)
+set(GTEST_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/googletest/googletest/include)
+set(GTEST_MAIN_LIBRARY ${GTEST_LIBRARY})
+
+#9. compile test files
+find_package(GTest)
+if (GTEST_FOUND)
+  file(GLOB TEST_FILE ${PROJECT_SOURCE_DIR}/tests/*.cc)
+  foreach(testsourcefile ${TEST_FILE})                                     
+    string(REGEX MATCH "[^/]+$" testsourcefilewithoutpath ${testsourcefile})
+    string(REPLACE ".cc" "" testname ${testsourcefilewithoutpath})
+    add_executable( ${testname} ${testsourcefile})
+    target_link_libraries(${testname}
+      yaml-cpp
+      gtest 
+      pthread
+    )
+ENDFOREACH(testsourcefile ${TEST_FILE})
+endif()
+
