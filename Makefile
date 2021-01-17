@@ -1,11 +1,12 @@
 CC=g++
-CFLAGS=-std=c++11 -g -Wall -pthread  -fgnu-tm
-INCLUDES=-I ./
 TEST_INCLUDES=-I ./third_party/yaml-cpp/include -I ./third_party/googletest/googletest/include
 LD_TEST=-lgtest
 TEST_LIB_STATIC=./third_party/yaml-cpp/build/*.a ./third_party/googletest/build/lib/*.a
 TEST_SRCS=$(wildcard tests/*.cc)
 TEST_BIN =$(TEST_SRCS:.cc=)
+
+CFLAGS=-std=c++11 -g -Wall -pthread  -fgnu-tm
+INCLUDES=-I ./
 LDFLAGS= -lpthread
 SUBDIRS=db core
 SUBSRCS=$(wildcard db/*.cc) $(wildcard core/*.cc)
