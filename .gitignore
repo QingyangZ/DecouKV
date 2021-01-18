@@ -38,6 +38,13 @@
 *.output
 
 .vscode/
+.cache/
 build/
 redis/sample
+compile_commands.json
+
 ycsbc
+
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/
