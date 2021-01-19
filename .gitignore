@@ -40,6 +40,7 @@
 .vscode/
 .cache/
 build/
+.clangd/
 redis/sample
 compile_commands.json
 
