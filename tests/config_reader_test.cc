@@ -12,7 +12,7 @@
 #include <fstream>
 #include <sys/types.h>
 #include <vector>
-
+#include "../core/config_reader.h"
 bool convert_to_string(std::string& target_size, uint64_t base_size){
   target_size.clear();
   if (base_size  >= 1<< 30){
@@ -133,7 +133,15 @@ TEST(YAMLTest, TestConvertSize){
   std::string expect_str = "3GB";
   ASSERT_STREQ(test2.c_str(), expect_str.c_str());
 }
+TEST(Config_ReaderTest, TestInit){
+  ycsbc::Config_Reader config_reader = ycsbc::Config_Reader("/home/kvgroup/zhenliu/YCSB-C/db_config.yaml");
+  ASSERT_EQ(config_reader.get_config("rocksdb").memtable_size_, uint64_t(134217728));
+  ASSERT_EQ(config_reader.get_config("rocksdb").thread_compaction_, uint64_t(8));
+  ASSERT_EQ(config_reader.get_config("rocksdb").block_cache_size_,uint64_t(8589934592));
+  ASSERT_EQ(config_reader.get_config("rocksdb").bloom_bits_,uint64_t(10));
+  ASSERT_FALSE(config_reader.get_config("rocksdb").enable_direct_io_);
 
+}
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
