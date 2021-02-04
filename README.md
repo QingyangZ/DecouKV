@@ -1,4 +1,4 @@
-# YCSB-C
+# YCSB-C ![build and test](https://github.com/ZacharyLiu-CS/YCSB-C/workflows/build%20and%20test/badge.svg)
 
 Yahoo! Cloud Serving Benchmark in C++, a C++ version of YCSB (https://github.com/brianfrankcooper/YCSB/wiki)
 

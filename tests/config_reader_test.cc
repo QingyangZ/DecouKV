@@ -134,7 +134,7 @@ TEST(YAMLTest, TestConvertSize){
   ASSERT_STREQ(test2.c_str(), expect_str.c_str());
 }
 TEST(Config_ReaderTest, TestInit){
-  ycsbc::Config_Reader config_reader = ycsbc::Config_Reader("/home/kvgroup/zhenliu/YCSB-C/db_config.yaml");
+  ycsbc::Config_Reader config_reader = ycsbc::Config_Reader("../db_config.yaml");
   ASSERT_EQ(config_reader.get_config("rocksdb").memtable_size_, uint64_t(134217728));
   ASSERT_EQ(config_reader.get_config("rocksdb").thread_compaction_, uint64_t(8));
   ASSERT_EQ(config_reader.get_config("rocksdb").block_cache_size_,uint64_t(8589934592));

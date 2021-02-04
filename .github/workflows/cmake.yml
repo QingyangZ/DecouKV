@@ -25,7 +25,8 @@ jobs:
       uses: Trass3r/setup-cpp@v1
 
     - name: build third-party
-      run: ${{github.workspac}}/third_party/build_third_party.sh
+      working-directory: ${{github.workspace}}/third_party
+      run: ${{github.workspace}}/third_party/build_third_party.sh
       shell: bash
       
     - name: Create Build Environment
@@ -49,9 +50,14 @@ jobs:
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: cmake --build . --config $BUILD_TYPE
 
+    - name: CheckFile
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: cat $GITHUB_WORKSPACE/db_config.yaml
+
     - name: Test
       working-directory: ${{github.workspace}}/build
       shell: bash
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C $BUILD_TYPE
+      run: ctest
