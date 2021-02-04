@@ -42,6 +42,7 @@ set(GTEST_MAIN_LIBRARY ${GTEST_LIBRARY})
 
 #9. compile test files
 find_package(GTest)
+enable_testing()
 if (GTEST_FOUND)
   file(GLOB TEST_FILE ${PROJECT_SOURCE_DIR}/tests/*.cc)
   foreach(testsourcefile ${TEST_FILE})
@@ -53,6 +54,7 @@ if (GTEST_FOUND)
       gtest
       pthread
       )
+    add_test(NAME ${testname} COMMAND ${testname})
   ENDFOREACH(testsourcefile ${TEST_FILE})
 endif()
 
