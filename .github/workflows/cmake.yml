@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: checkout 
+    - name: checkout
       uses: actions/checkout@v2
       with:
         ref: master
@@ -24,11 +24,16 @@ jobs:
     - name: setup c++
       uses: Trass3r/setup-cpp@v1
 
+    - name: setup db environment
+      working-directory: ${{github.workspace}}/db_impl
+      run: ${{github.workspace}}/db_impl/build_db_impl.sh
+      shell: bash
+
     - name: build third-party
       working-directory: ${{github.workspace}}/third_party
       run: ${{github.workspace}}/third_party/build_third_party.sh
       shell: bash
-      
+
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
       # We'll use this as our working directory for all subsequent commands
@@ -39,8 +44,8 @@ jobs:
       # access regardless of the host operating system
       shell: bash
       working-directory: ${{github.workspace}}/build
-      # Note the current convention is to use the -S and -B options here to specify source 
-      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # Note the current convention is to use the -S and -B options here to specify source
+      # and build directories, but this is only available with CMake 3.13 and higher.
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
@@ -58,6 +63,6 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       shell: bash
-      # Execute tests defined by the CMake configuration.  
+      # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C $BUILD_TYPE
