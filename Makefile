@@ -1,7 +1,7 @@
 CC=g++
 TEST_INCLUDES=-I ./third_party/yaml-cpp/include -I ./third_party/googletest/googletest/include
 LD_TEST=-lgtest -L ./third_party/googletest/build/lib/
-TEST_LIB_STATIC=./third_party/yaml-cpp/build/*.a ./third_party/googletest/build/lib/*.a
+TEST_LIB_STATIC=./third_party/yaml-cpp/build/*.a ./third_party/googletest/build/lib/*.a ./db_impl/leveldb/build/libleveldb.a 
 TEST_SRCS=$(wildcard tests/*.cc)
 TEST_BIN =$(TEST_SRCS:.cc=)
 

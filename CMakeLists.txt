@@ -6,7 +6,7 @@ project(ycsbc)
 
 #3. specify c++ compiler version
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -pthread")
+set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall ")
 
 #4. head file path
 include_directories(
@@ -15,12 +15,15 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/core
   ${PROJECT_SOURCE_DIR}/third_party/yaml-cpp/include
   ${PROJECT_SOURCE_DIR}/third_party/googletest/googletest/include
+  ${PROJECT_SOURCE_DIR}/db_impl/leveldb/include
+  # ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/include
   )
 
 #5. third path link path
 link_directories(
   ${PROJECT_SOURCE_DIR}/third_party/yaml-cpp/build/
   ${PROJECT_SOURCE_DIR}/third_party/googletest/build/lib/
+  ${PROJECT_SOURCE_DIR}/db_impl/leveldb/build/
   )
 
 #6. source code file path
@@ -32,7 +35,12 @@ file(GLOB SOURCE_FILE
 
 #7. define the executable
 add_executable(${PROJECT_NAME} ${SOURCE_FILE})
-target_link_libraries(${PROJECT_NAME} pthread )
+target_link_libraries(${PROJECT_NAME}
+  pthread
+  leveldb
+  yaml-cpp
+  gtest
+  )
 
 #8. define gtest path
 set(GTEST_LIBRARY ${PROJECT_SOURCE_DIR}/third_party/googletest/build/lib)
