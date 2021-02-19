@@ -13,37 +13,6 @@
 #include <sys/types.h>
 #include <vector>
 #include "../core/config_reader.h"
-bool convert_to_string(std::string& target_size, uint64_t base_size){
-  target_size.clear();
-  if (base_size  >= 1<< 30){
-    uint64_t prefix = base_size >> 30;
-    target_size += std::to_string(prefix);
-    target_size += "GB";
-  }else if(base_size >= 1<< 20){
-    uint64_t prefix = base_size >> 20;
-    target_size += std::to_string(prefix);
-    target_size += "MB";
-  }else{
-    return false;
-  }
-  return true;
-}
-uint64_t convert_to_base(std::string & target_size){
-  size_t position_GB = target_size.find("GB");
-  size_t position_MB = target_size.find("MB");
-  uint64_t base_size = 0;
-  if ( position_GB != std::string::npos){
-    double prefix = std::stod(target_size.substr(0,target_size.size() -2 ));
-    base_size += prefix * (1<< 30);
-  }
-  if ( position_MB != std::string::npos){
-    double prefix = std::stod(target_size.substr(0,target_size.size() -2 ));
-    base_size += prefix * (1<< 20);
-  }
-  return base_size;
-}
-
-
 
 struct db_config {
   uint64_t bloom_bits_;
@@ -66,9 +35,9 @@ struct YAML::convert<db_config>{
     std::string block_cache_size;
     std::string memtable_size;
     std::string sst_file_size;
-    convert_to_string(block_cache_size, dc.block_cache_size_);
-    convert_to_string(memtable_size, dc.memtable_size_);
-    convert_to_string(sst_file_size, dc.sst_file_size_);
+    ycsbc::convert_to_string(block_cache_size, dc.block_cache_size_);
+    ycsbc::convert_to_string(memtable_size, dc.memtable_size_);
+    ycsbc::convert_to_string(sst_file_size, dc.sst_file_size_);
     node.push_back(block_cache_size);
     node.push_back(memtable_size);
     node.push_back(sst_file_size);
@@ -86,9 +55,9 @@ struct YAML::convert<db_config>{
     std::string block_cache_size = node["block_cache_size"].as<std::string>();
     std::string memtable_size = node["memtable_size"].as<std::string>();
     std::string sst_file_size = node["sst_file_size"].as<std::string>();
-    dc.block_cache_size_ = convert_to_base(block_cache_size);
-    dc.memtable_size_ = convert_to_base(memtable_size);
-    dc.sst_file_size_ = convert_to_base(sst_file_size);
+    dc.block_cache_size_ = ycsbc::convert_to_base(block_cache_size);
+    dc.memtable_size_ = ycsbc::convert_to_base(memtable_size);
+    dc.sst_file_size_ = ycsbc::convert_to_base(sst_file_size);
     return true;
   }
 };
@@ -125,11 +94,11 @@ TEST(YAMLTest, TestReadDBConfig){
 TEST(YAMLTest, TestConvertSize){
   std::string test1 = "100MB";
   uint64_t expect_base = 104857600;
-  ASSERT_EQ(convert_to_base(test1),expect_base );
+  ASSERT_EQ(ycsbc::convert_to_base(test1),expect_base );
   std::string test2;
   uint64_t test2_base = 3;
   test2_base = test2_base << 30;
-  convert_to_string(test2,test2_base);
+  ycsbc::convert_to_string(test2,test2_base);
   std::string expect_str = "3GB";
   ASSERT_STREQ(test2.c_str(), expect_str.c_str());
 }

@@ -15,7 +15,6 @@
 #include "yaml-cpp/node/parse.h"
 #include "yaml-cpp/yaml.h"
 
-using namespace YAML;
 namespace ycsbc {
 
   struct db_config {
@@ -28,8 +27,7 @@ namespace ycsbc {
     uint64_t sst_file_size_;
   };
 
-
-  bool convert_to_string(std::string& target_size, uint64_t base_size){
+  inline bool convert_to_string(std::string& target_size, uint64_t base_size){
     target_size.clear();
     if (base_size  >= 1<< 30){
       uint64_t prefix = base_size >> 30;
@@ -44,7 +42,7 @@ namespace ycsbc {
     }
     return true;
   }
-  uint64_t convert_to_base(std::string & target_size){
+  inline uint64_t convert_to_base(std::string & target_size){
     size_t position_GB = target_size.find("GB");
     size_t position_MB = target_size.find("MB");
     uint64_t base_size = 0;
@@ -59,11 +57,9 @@ namespace ycsbc {
     return base_size;
   }
 
-
-
 } // namespace ycsbc
 
-namespace YAML{
+namespace YAML {
   template<>
     struct convert<ycsbc::db_config>{
       static YAML::Node encode(const ycsbc::db_config& dc){

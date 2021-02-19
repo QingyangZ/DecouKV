@@ -8,23 +8,17 @@
 
 #include "db/db_factory.h"
 
-#include <string>
-#include "db/basic_db.h"
-#include "db/lock_stl_db.h"
-#include "db/leveldb_db.h"
-
-using namespace std;
-using ycsbc::DB;
-using ycsbc::DBFactory;
-
-DB* DBFactory::CreateDB(utils::Properties &props) {
-  if (props["dbname"] == "basic") {
-    return new BasicDB;
-  } else if (props["dbname"] == "lock_stl") {
-    return new LockStlDB;
-  } else if (props["dbname"] == "leveldb"){
-    return new LevelDB(props["dbfilename"].c_str());
+namespace ycsbc {
+  DB* DBFactory::CreateDB(utils::Properties &props) {
+    if (props["dbname"] == "basic") {
+      return new BasicDB;
+    } else if (props["dbname"] == "lock_stl") {
+      return new LockStlDB;
+    } else if (props["dbname"] == "leveldb") {
+      return new LevelDB(props["dbpath"].c_str());
+    } else if (props["dbname"] == "rocksdb") {
+      return new RocksDB(props["dbpath"].c_str());
+    } else return NULL;
   }
-  else return NULL;
-}
 
+}

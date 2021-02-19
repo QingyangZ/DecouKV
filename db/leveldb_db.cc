@@ -7,7 +7,6 @@
 //
 
 #include "leveldb_db.h"
-#include "core/config_reader.h"
 
 #include <iostream>
 #include <vector>
@@ -98,5 +97,5 @@ namespace ycsbc {
     printStats();
     delete db_;
   }
-} //ycsbc
 
+} //ycsbc

@@ -59,7 +59,7 @@ int main(const int argc, const char *argv[]) {
   int total_ops = stoi(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY]);
   for (int i = 0; i < num_threads; ++i) {
     actual_ops.emplace_back(async(launch::async,
-        DelegateClient, db, &wl, total_ops / num_threads, true));
+          DelegateClient, db, &wl, total_ops / num_threads, true));
   }
   assert((int)actual_ops.size() == num_threads);
 
@@ -77,7 +77,7 @@ int main(const int argc, const char *argv[]) {
   timer.Start();
   for (int i = 0; i < num_threads; ++i) {
     actual_ops.emplace_back(async(launch::async,
-        DelegateClient, db, &wl, total_ops / num_threads, false));
+          DelegateClient, db, &wl, total_ops / num_threads, false));
   }
   assert((int)actual_ops.size() == num_threads);
 
@@ -136,7 +136,15 @@ string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) 
       }
       props.SetProperty("slaves", argv[argindex]);
       argindex++;
-    } else if (strcmp(argv[argindex], "-P") == 0) {
+    }else if (strcmp(argv[argindex], "-dbpath") == 0){
+      argindex++;
+      if(argindex >= argc){
+        UsageMessage(argv[0]);
+        exit(0);
+      }
+      props.SetProperty("dbpath", argv[argindex]);
+      argindex++;
+    }else if (strcmp(argv[argindex], "-P") == 0) {
       argindex++;
       if (argindex >= argc) {
         UsageMessage(argv[0]);

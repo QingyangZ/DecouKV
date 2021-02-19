@@ -16,7 +16,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/third_party/yaml-cpp/include
   ${PROJECT_SOURCE_DIR}/third_party/googletest/googletest/include
   ${PROJECT_SOURCE_DIR}/db_impl/leveldb/include
-  # ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/include
+  ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/include
   )
 
 #5. third path link path
@@ -24,6 +24,7 @@ link_directories(
   ${PROJECT_SOURCE_DIR}/third_party/yaml-cpp/build/
   ${PROJECT_SOURCE_DIR}/third_party/googletest/build/lib/
   ${PROJECT_SOURCE_DIR}/db_impl/leveldb/build/
+  ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/build/
   )
 
 #6. source code file path
@@ -38,8 +39,10 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILE})
 target_link_libraries(${PROJECT_NAME}
   pthread
   leveldb
+  rocksdb
   yaml-cpp
   gtest
+  snappy
   )
 
 #8. define gtest path
@@ -59,6 +62,8 @@ if (GTEST_FOUND)
     target_link_libraries(${testname}
       yaml-cpp
       gtest
+      leveldb
+      rocksdb
       pthread
       )
     add_test(NAME ${testname} COMMAND ${testname})

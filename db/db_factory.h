@@ -11,6 +11,11 @@
 
 #include "core/db.h"
 #include "core/properties.h"
+#include "db/basic_db.h"
+#include "db/lock_stl_db.h"
+#include "db/leveldb_db.h"
+#include "db/rocksdb_db.h"
+#include <string>
 
 namespace ycsbc {
 

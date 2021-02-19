@@ -24,6 +24,10 @@ jobs:
     - name: setup c++
       uses: Trass3r/setup-cpp@v1
 
+    - name: Install package
+      run: sudo apt install libsnappy-dev
+      shell: bash
+
     - name: setup db environment
       working-directory: ${{github.workspace}}/db_impl
       run: ${{github.workspace}}/db_impl/build_db_impl.sh

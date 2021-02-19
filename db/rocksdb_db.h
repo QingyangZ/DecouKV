@@ -1,23 +1,24 @@
 //
-//  leveldb_db.h
+//  rocksdb_db.h
 //  YCSB-C
 //
-//  Created by zhenliu on 05/02/2021.
+//  Created by zhenliu on 18/02/2021.
 //  Copyright (c) 2021 zhenliu <liuzhenm@mail.ustc.edu.cn>.
 //
 
-#ifndef YCSB_C_LEVELDB_DB_H
-#define YCSB_C_LEVELDB_DB_H
+#ifndef YCSB_C_ROCKSDB_DB_H
+#define YCSB_C_ROCKSDB_DB_H
 
-#include "core/config_reader.h"
 #include "core/db.h"
-#include "leveldb/db.h"
-#include "leveldb/options.h"
+#include "core/config_reader.h"
+#include "rocksdb/db.h"
+#include "rocksdb/options.h"
 
 namespace ycsbc {
-  class LevelDB : public DB {
+
+  class RocksDB : public DB{
     public:
-      LevelDB(const char *dbfilename);
+      RocksDB(const char *dbfilename);
       int Read(const std::string &table, const std::string &key,
           const std::vector<std::string> *fields,
           std::vector<KVPair> &result);
@@ -32,21 +33,18 @@ namespace ycsbc {
       int Update(const std::string &table, const std::string &key,
           std::vector<KVPair> &values);
 
-
       int Delete(const std::string &table, const std::string &key);
 
       void printStats();
 
-      ~LevelDB();
+      ~RocksDB();
 
     private:
-      leveldb::DB *db_;
-      leveldb::Options options;
+      rocksdb::DB *db_;
+      rocksdb::Options options;
       unsigned no_found;
 
-  }; //end of LevelDB
+  }; //end of YCSB
+} // ycsbc
 
-}  //ycsbc
-
-#endif //YCSB_C_LEVELDB_DB_H
-
+#endif // YCSB_C_ROCKSDB_DB_H
