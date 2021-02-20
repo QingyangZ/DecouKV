@@ -6,7 +6,7 @@ project(ycsbc)
 
 #3. specify c++ compiler version
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall ")
+set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -pthread ")
 
 #4. head file path
 include_directories(
@@ -43,6 +43,11 @@ target_link_libraries(${PROJECT_NAME}
   yaml-cpp
   gtest
   snappy
+  zstd
+  lz4
+  bz2
+  z
+  dl
   )
 
 #8. define gtest path

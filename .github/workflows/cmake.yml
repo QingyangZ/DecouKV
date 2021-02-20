@@ -25,7 +25,7 @@ jobs:
       uses: Trass3r/setup-cpp@v1
 
     - name: Install package
-      run: sudo apt install libsnappy-dev
+      run: sudo apt install libsnappy-dev libgflags-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev libpthread-stubs0-dev
       shell: bash
 
     - name: setup db environment
