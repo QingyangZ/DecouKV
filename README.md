@@ -3,27 +3,44 @@
 Yahoo! Cloud Serving Benchmark in C++, a C++ version of YCSB (https://github.com/brianfrankcooper/YCSB/wiki)
 
 ## Quick Start
+To init submodules
+
+```
+$ git submodules init
+$ git submodules update
+```
+To install packages
+
+```
+$ sudo apt install libsnappy-dev libgflags-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev libpthread-stubs0-dev
+```
+
+To build third-party and db imples
+```
+$ cd third-party && ./build_third_party.sh
+$ cd db_impl && ./build_db_impl.sh
+```
 
 To build YCSB-C on Ubuntu, for example:
 
 ```
-$ sudo apt-get install libtbb-dev
-$ make
+$ mkdir -p build && cd build
+$ cmake -DCMAKE_BUILD_TYPE=Release ..
+$ cmake --build . -j
 ```
 
-As the driver for Redis is linked by default, change the runtime library path
-to include the hiredis library by:
+To run test:
+
 ```
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+$ cd build && ctest
 ```
 
-Run Workload A with a [TBB](https://www.threadingbuildingblocks.org)-based
+Run Workload A with a leveldb
 implementation of the database, for example:
 ```
-./ycsbc -db tbb_rand -threads 4 -P workloads/workloada.spec
+$ cd build
+$ ./ycsbc -db leveldb -dbpath . -P ../workloads/workloada.spec -threads 4
 ```
-Also reference run.sh and run\_redis.sh for the command line. See help by
-invoking `./ycsbc` without any arguments.
 
 Note that we do not have load and run commands as the original YCSB. Specify
 how many records to load by the recordcount property. Reference properties
