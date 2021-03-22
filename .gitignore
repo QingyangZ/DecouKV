@@ -50,3 +50,6 @@ CMakeCache.txt
 cmake_install.cmake
 CMakeFiles/
 Testing/
+
+CTestTestfile.cmake
+Makefile

@@ -35,6 +35,8 @@ namespace ycsbc {
 
       int Delete(const std::string &table, const std::string &key);
 
+      void close();
+
       void printStats();
 
       ~LevelDB();

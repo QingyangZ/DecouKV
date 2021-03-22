@@ -90,10 +90,12 @@ namespace ycsbc {
   void LevelDB::printStats(){
     std::string stats;
     db_->GetProperty("leveldb.stats",&stats);
-    cerr << stats << endl;
+    cout << stats << endl;
+    cout << "Missing operations count : " << no_found << endl;
   }
 
   LevelDB::~LevelDB(){
+    cout << "start to run destructor" << endl;
     printStats();
     delete db_;
   }

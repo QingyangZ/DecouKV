@@ -16,12 +16,12 @@
 #include "db/leveldb_db.h"
 #include "db/rocksdb_db.h"
 #include <string>
-
+#include <memory>
 namespace ycsbc {
 
 class DBFactory {
  public:
-  static DB* CreateDB(utils::Properties &props);
+  static std::shared_ptr<DB> CreateDB(utils::Properties &props);
 };
 
 } // ycsbc
