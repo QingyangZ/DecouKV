@@ -7,7 +7,10 @@
 //
 
 #include <algorithm>
+#include <chrono>
 #include <cstring>
+#include <memory>
+#include <ratio>
 #include <string>
 #include <iostream>
 #include <vector>
@@ -18,6 +21,7 @@
 #include "core/core_workload.h"
 #include "db.h"
 #include "db/db_factory.h"
+#include "histogram.h"
 
 using namespace std;
 
@@ -26,16 +30,20 @@ bool StrStartWith(const char *str, const char *pre);
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 
 int DelegateClient(shared_ptr<ycsbc::DB> db, ycsbc::CoreWorkload *wl, const int num_ops,
-    bool is_loading) {
+    bool is_loading,shared_ptr<utils::Histogram> histogram) {
   db->Init();
+  utils::Timer<utils::t_microseconds> timer;
   ycsbc::Client client(db, *wl);
   int oks = 0;
   for (int i = 0; i < num_ops; ++i) {
+    timer.Start();
     if (is_loading) {
       oks += client.DoInsert();
     } else {
       oks += client.DoTransaction();
     }
+    double duration = timer.End();
+    histogram->Add_Fast(duration);
   }
   db->Close();
   return oks;
@@ -56,14 +64,21 @@ int main(const int argc, const char *argv[]) {
   const int num_threads = stoi(props.GetProperty("threadcount", "1"));
 
   vector<future<int>> actual_ops;
+  vector<shared_ptr<utils::Histogram>> histogram_list;
+  utils::Timer<utils::t_microseconds> timer;
+
   int total_ops = 0;
   int sum = 0;
   if (props.GetProperty("skipload") != "true"){
     // Loads data
+    timer.Start();
     total_ops = stoi(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY]);
     for (int i = 0; i < num_threads; ++i) {
+      auto histogram_tmp = make_shared<utils::Histogram>(utils::RecordUnit::h_microseconds);
+      histogram_list.push_back(histogram_tmp);
       actual_ops.emplace_back(async(launch::async,
-            DelegateClient, db, &wl, total_ops / num_threads, true));
+            DelegateClient, db, &wl, total_ops / num_threads, true, histogram_tmp));
+
     }
     assert((int)actual_ops.size() == num_threads);
 
@@ -71,18 +86,29 @@ int main(const int argc, const char *argv[]) {
       assert(n.valid());
       sum += n.get();
     }
+    double duration = timer.End();
+    utils::Histogram histogram(utils::RecordUnit::h_microseconds);
+    for (auto &h : histogram_list){
+        histogram.Merge(*h);
+    }
     cerr << "# Loading records:\t" << sum << endl;
+    cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t';
+    cerr << total_ops / (duration/ histogram.GetRecordUnit()) << " OPS" << endl;
+    cerr << histogram.ToString() << endl;
   }else {
     cerr << "# Skipped load records!" << endl;
   }
+
   // Peforms transactions
   actual_ops.clear();
+  histogram_list.clear();
   total_ops = stoi(props[ycsbc::CoreWorkload::OPERATION_COUNT_PROPERTY]);
-  utils::Timer<double> timer;
   timer.Start();
   for (int i = 0; i < num_threads; ++i) {
+    auto histogram_tmp = make_shared<utils::Histogram>(utils::RecordUnit::h_microseconds);
+    histogram_list.push_back(histogram_tmp);
     actual_ops.emplace_back(async(launch::async,
-          DelegateClient, db, &wl, total_ops / num_threads, false));
+          DelegateClient, db, &wl, total_ops / num_threads, false, histogram_tmp));
   }
   assert((int)actual_ops.size() == num_threads);
 
@@ -91,10 +117,16 @@ int main(const int argc, const char *argv[]) {
     assert(n.valid());
     sum += n.get();
   }
-  double duration = timer.End();
+  utils::Histogram histogram(utils::RecordUnit::h_microseconds);
+  for (auto &h : histogram_list){
+    histogram.Merge( *h );
+  }
+
+  auto duration = timer.End();
   cerr << "# Transaction throughput (KTPS)" << endl;
   cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t';
-  cerr << total_ops / duration / 1000 << endl;
+  cerr << total_ops / (duration / histogram.GetRecordUnit()) << " OPS" << endl;
+  cerr << histogram.ToString() << endl;
 }
 
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) {
@@ -193,7 +225,7 @@ void UsageMessage(const char *command) {
   cout << "  -threads n: execute using n threads (default: 1)" << endl;
   cout << "  -db dbname: specify the name of the DB to use (default: basic)" << endl;
   cout << "  -dbpath: specify the path of DB location" << endl;
-  cout << "  -skipload: whethe to run the load phase, sometime you can run on an existing database" << endl;
+  cout << "  -skipload: whether to run the load phase, sometime you can run on an existing database" << endl;
   cout << "  -P propertyfile: load properties from the given file. Multiple files can" << endl;
   cout << "                   be specified, and will be processed in the order specified" << endl;
 }

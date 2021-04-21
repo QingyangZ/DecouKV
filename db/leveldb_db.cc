@@ -95,7 +95,7 @@ namespace ycsbc {
   }
 
   LevelDB::~LevelDB(){
-    cout << "start to run destructor" << endl;
+    cout << "print leveldb statistics: " << endl;
     printStats();
     delete db_;
   }

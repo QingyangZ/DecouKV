@@ -28,14 +28,16 @@ link_directories(
   )
 
 #6. source code file path
-file(GLOB SOURCE_FILE
+file(GLOB MAIN_FILE
   ${PROJECT_SOURCE_DIR}/ycsbc.cc
+  )
+file(GLOB SOURCE_FILE
   ${PROJECT_SOURCE_DIR}/core/*.cc
   ${PROJECT_SOURCE_DIR}/db/*.cc
   )
 
 #7. define the executable
-add_executable(${PROJECT_NAME} ${SOURCE_FILE})
+add_executable(${PROJECT_NAME} ${MAIN_FILE} ${SOURCE_FILE})
 target_link_libraries(${PROJECT_NAME}
   pthread
   leveldb
@@ -63,13 +65,14 @@ if (GTEST_FOUND)
   foreach(testsourcefile ${TEST_FILE})
     string(REGEX MATCH "[^/]+$" testsourcefilewithoutpath ${testsourcefile})
     string(REPLACE ".cc" "" testname ${testsourcefilewithoutpath})
-    add_executable( ${testname} ${testsourcefile})
+    add_executable( ${testname} ${testsourcefile} ${SOURCE_FILE})
     target_link_libraries(${testname}
       yaml-cpp
       gtest
       leveldb
       rocksdb
       pthread
+      snappy
       )
     add_test(NAME ${testname} COMMAND ${testname})
   ENDFOREACH(testsourcefile ${TEST_FILE})

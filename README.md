@@ -6,8 +6,8 @@ Yahoo! Cloud Serving Benchmark in C++, a C++ version of YCSB (https://github.com
 To init submodules
 
 ```
-$ git submodules init
-$ git submodules update
+$ git submodule init
+$ git submodule update
 ```
 To install packages
 
