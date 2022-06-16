@@ -169,7 +169,7 @@ TEST(HistogramTest, TestAddPerformance){
 
   timer.Start();
   for ( int  n = 0; n < times ; n++){
-    for(int i = 0; i <= t; i++){
+    for(int i = 0; i < t; i++){
       histogram_list.Add(values[i]);
     }
   }
@@ -181,7 +181,7 @@ TEST(HistogramTest, TestAddPerformance){
 
   timer.Start();
   for ( int  n = 0; n < times ; n++){
-    for(int i = 0; i <= t; i++){
+    for(int i = 0; i < t; i++){
       histogram_list.Add_Fast(values[i]);
     }
   }
