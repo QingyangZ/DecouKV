@@ -29,6 +29,7 @@ namespace ycsbc {
     options.create_if_missing = true;
     options.enable_direct_io = dc.enable_direct_io_;
     options.enable_compaction = dc.enable_compaction_;
+    options.use_global_index = dc.use_global_index_;
     options.thread_compaction = dc.thread_compaction_;
     options.filter_policy = leveldb::NewBloomFilterPolicy(dc.bloom_bits_);
     options.block_cache = leveldb::NewLRUCache(dc.block_cache_size_);
