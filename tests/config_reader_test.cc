@@ -18,6 +18,7 @@ struct db_config {
   uint64_t bloom_bits_;
   bool enable_direct_io_;
   bool enable_compaction_;
+  bool use_global_index_;
   uint64_t thread_compaction_;
   uint64_t block_cache_size_;
   uint64_t memtable_size_;
@@ -31,6 +32,7 @@ struct YAML::convert<db_config>{
     node.push_back(dc.bloom_bits_);
     node.push_back(dc.enable_direct_io_);
     node.push_back(dc.enable_compaction_);
+    node.push_back(dc.use_global_index_);
     node.push_back(dc.thread_compaction_);
     std::string block_cache_size;
     std::string memtable_size;
@@ -51,6 +53,7 @@ struct YAML::convert<db_config>{
     dc.bloom_bits_ = node["bloom_bits"].as<uint64_t>();
     dc.enable_direct_io_ = node["enable_direct_io"].as<bool>();
     dc.enable_compaction_ = node["enable_compaction"].as<bool>();
+    dc.use_global_index_ = node["use_global_index"].as<bool>();
     dc.thread_compaction_ = node["thread_compaction"].as<uint64_t>();
     std::string block_cache_size = node["block_cache_size"].as<std::string>();
     std::string memtable_size = node["memtable_size"].as<std::string>();
