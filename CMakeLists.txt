@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 3.10)
 project(ycsbc)
 
 #3. specify c++ compiler version
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -pthread ")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -pthread ")
 
 #4. head file path
 include_directories(

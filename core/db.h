@@ -92,7 +92,84 @@ class DB {
 
   virtual ~DB() { }
 };
+inline void ShiftZeroToChar(char *p, uint32_t len){
+  for( uint32_t i = 0; i < len; i++ ){
+    if( *(uint8_t*)(p+i) == 0){
+       *(uint8_t*)(p+i) = uint8_t(255);
+    }
+  }
+}
+inline void ShiftCharToZero(char *p, uint32_t len){
+  for( uint32_t i = 0; i < len; i++ ){
+    if( *(uint8_t*)(p+i) == 255){
+       *(uint8_t*)(p+i) = uint8_t(0);
+    }
+  }
+}
+// convert value_fields -> data
+inline void SerializeRow(const std::vector<DB::KVPair>& value_fields, std::string& data){
+  // get the field name and value size
+  uint32_t field_name_len = value_fields[0].first.size();
+  uint32_t field_value_len = value_fields[0].second.size();
+  uint32_t data_size = value_fields.size() * (2 * sizeof(uint32_t) + field_name_len + field_value_len);
+  data.reserve(data_size);
+  for (const DB::KVPair& p : value_fields) {
+    uint32_t name_len = p.first.size();
+    // ShiftZeroToChar(reinterpret_cast<char*>(&name_len),sizeof(uint32_t));
+    data.append(reinterpret_cast<char*>(&name_len), sizeof(uint32_t));
+    data.append(p.first.data(), p.first.size());
+    uint32_t value_len = p.second.size();
+    // ShiftZeroToChar(reinterpret_cast<char*>(&value_len),sizeof(uint32_t));
+    data.append(reinterpret_cast<char*>(&value_len), sizeof(uint32_t));
+    data.append(p.second.data(), p.second.size());
+  }
+}
 
+// convert data -> value_fields
+inline void DeserializeRow(std::vector<DB::KVPair>& value_fields, const std::string& data){
+  const char* p = data.data();
+  const char* end = p + data.size();
+  while (p != end) {
+    if (p >= end - 4)
+      break;
+    uint32_t len = *reinterpret_cast<const uint32_t*>(p);
+    //ShiftCharToZero(reinterpret_cast<char*>(&len),sizeof(uint32_t));
+    p += sizeof(uint32_t);
+    std::string field(p, uint32_t(len));
+    p += len;
+    len = *reinterpret_cast<const uint32_t*>(p);
+    p += sizeof(uint32_t);
+    //ShiftCharToZero(reinterpret_cast<char*>(&len),sizeof(uint32_t));
+    std::string value(p, uint32_t(len));
+    p += len;
+    value_fields.push_back(std::make_pair<std::string, std::string>(std::move(field), std::move(value)));
+  }
+}
+// convert data -> value_fields by filter
+inline void DeserializeRowFilter(std::vector<DB::KVPair>& value_fields, const std::string& data,
+    const std::vector<std::string>& fields){
+  const char* p = data.data();
+  const char* end = p + data.size();
+  std::vector<std::string>::const_iterator filter_iter = fields.begin();
+  while (p != end && filter_iter != fields.end()) {
+    if (p >= end - 4)
+      break;
+    uint32_t len = *reinterpret_cast<const uint32_t*>(p);
+    //ShiftCharToZero(reinterpret_cast<char*>(&len),sizeof(uint32_t));
+    p += sizeof(uint32_t);
+    std::string field(p, uint32_t(len));
+    p += len;
+    len = *reinterpret_cast<const uint32_t*>(p);
+    //ShiftCharToZero(reinterpret_cast<char*>(&len),sizeof(uint32_t));
+    p += sizeof(uint32_t);
+    std::string value(p, uint32_t(len));
+    p += len;
+    if (*filter_iter == field){
+      value_fields.push_back(std::make_pair<std::string, std::string>(std::move(field), std::move(value)));
+      filter_iter++;
+    }
+  }
+}
 } // ycsbc
 
 #endif // YCSB_C_DB_H_
