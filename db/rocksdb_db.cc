@@ -21,6 +21,13 @@ using std::cout;
 using std::endl;
 using std::cerr;
 
+#define LOGOUT(msg)                   \
+  do{                                 \
+    std::cerr << msg << std::endl;    \
+    exit(0);                          \
+  } while (0)
+
+
 namespace ycsbc {
 
   RocksDB::RocksDB(const char *dbfilename) :no_found(0){
@@ -32,6 +39,8 @@ namespace ycsbc {
     options.use_direct_reads = dc.enable_direct_io_;
     options.use_direct_io_for_flush_and_compaction = dc.enable_direct_io_;
     options.disable_auto_compactions= !dc.enable_compaction_;
+    options.use_global_index = dc.use_global_index_;
+    options.use_queue_monitor = dc.use_queue_monitor_;
     options.max_background_compactions = dc.thread_compaction_;
     options.max_background_jobs = dc.thread_compaction_ + 4;
     options.write_buffer_size = dc.memtable_size_;
@@ -72,6 +81,8 @@ namespace ycsbc {
     for( int i = 0; i < len; i++ ){
       if(!iter->Valid() || iter->value().empty() ){
         no_found++;
+        delete iter;
+        return DB::kOK; 
       }
       iter->Next();
     }
@@ -80,20 +91,61 @@ namespace ycsbc {
   }
 
   int RocksDB::Insert(const std::string &table, const std::string &key, std::vector<KVPair> &values){
+    std::string value;
+    SerializeRow(values, value);
     rocksdb::Status s;
-    for( KVPair &p :values ){
-      s = db_->Put(rocksdb::WriteOptions(),key,p.second);
+    s = db_->Put(rocksdb::WriteOptions(), key, value);
+    if (!s.ok()) {
+      LOGOUT(s.ToString());
     }
     return DB::kOK;
   }
 
   int RocksDB::Update(const std::string &table, const std::string &key, std::vector<KVPair> &values){
-    return Insert(table,key,values);
+    // first read values from db
+    std::string value;
+    rocksdb::Status s;
+    s = db_->Get(rocksdb::ReadOptions(), key, &value);
+    if(s.IsNotFound()){
+      this->no_found++;
+      return DB::kErrorNoData;
+    } else if (!s.ok()) {
+      LOGOUT(s.ToString());
+    }
+    if (value.size() == 0)
+      return DB::kOK;
+    // then update the specific field
+    std::vector<KVPair> current_values;
+    DeserializeRow(current_values, value);
+    for (auto& new_field : values) {
+      bool found = false;
+      for (auto& current_field : current_values) {
+        if (current_field.first == new_field.first) {
+          found = true;
+          current_field.second = new_field.second;
+          break;
+        }
+      }
+      if (found == false) {
+        break;
+      }
+    }
+
+    value.clear();
+    SerializeRow(current_values, value);
+    s = db_->Put(rocksdb::WriteOptions(), key, value);
+    if (!s.ok()) {
+      LOGOUT(s.ToString());
+    }
+    return DB::kOK;
   }
 
   int RocksDB::Delete(const std::string &table, const std::string &key){
-    std::vector<KVPair> values;
-    return Insert(table,key,values);
+    rocksdb::Status s = db_->Delete(rocksdb::WriteOptions(), key);
+    if (!s.ok()) {
+      LOGOUT(s.ToString());
+    }
+    return DB::kOK;
   }
 
   void RocksDB::printStats(){

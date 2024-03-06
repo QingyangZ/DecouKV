@@ -19,6 +19,13 @@
 using std::cout;
 using std::endl;
 using std::cerr;
+
+#define LOGOUT(msg)                   \
+  do{                                 \
+    std::cerr << msg << std::endl;    \
+    exit(0);                          \
+  } while (0)
+
 namespace ycsbc {
 
   LevelDB::LevelDB(const char *dbfilename) :no_found(0){
@@ -30,6 +37,7 @@ namespace ycsbc {
     options.enable_direct_io = dc.enable_direct_io_;
     options.enable_compaction = dc.enable_compaction_;
     options.use_global_index = dc.use_global_index_;
+    options.use_queue_monitor = dc.use_queue_monitor_;
     options.thread_compaction = dc.thread_compaction_;
     options.filter_policy = leveldb::NewBloomFilterPolicy(dc.bloom_bits_);
     options.block_cache = leveldb::NewLRUCache(dc.block_cache_size_);
@@ -64,6 +72,8 @@ namespace ycsbc {
     for( int i = 0; i < len; i++ ){
       if(!iter->Valid() || iter->value().empty() ){
         no_found++;
+        delete iter;
+        return DB::kOK; 
       }
       iter->Next();
     }
@@ -72,20 +82,62 @@ namespace ycsbc {
   }
 
   int LevelDB::Insert(const std::string &table, const std::string &key, std::vector<KVPair> &values){
+    std::string value;
+    SerializeRow(values, value);
+
     leveldb::Status s;
-    for( KVPair &p :values ){
-      s = db_->Put(leveldb::WriteOptions(),key,p.second);
+    s = db_->Put(leveldb::WriteOptions(), key, value);
+    if (!s.ok()) {
+      LOGOUT(s.ToString());
     }
     return DB::kOK;
   }
 
   int LevelDB::Update(const std::string &table, const std::string &key, std::vector<KVPair> &values){
-    return Insert(table,key,values);
+    // first read values from db
+    std::string value;
+    leveldb::Status s;
+    s = db_->Get(leveldb::ReadOptions(), key, &value);
+    if(s.IsNotFound()){
+      this->no_found++;
+      return DB::kErrorNoData;
+    } else if (!s.ok()) {
+      LOGOUT(s.ToString());
+    }
+    if (value.size() == 0)
+      return DB::kOK;
+    // then update the specific field
+    std::vector<KVPair> current_values;
+    DeserializeRow(current_values, value);
+    for (auto& new_field : values) {
+      bool found = false;
+      for (auto& current_field : current_values) {
+        if (current_field.first == new_field.first) {
+          found = true;
+          current_field.second = new_field.second;
+          break;
+        }
+      }
+      if (found == false) {
+        break;
+      }
+    }
+
+    value.clear();
+    SerializeRow(current_values, value);
+    s = db_->Put(leveldb::WriteOptions(), key, value);
+    if (!s.ok()) {
+      LOGOUT(s.ToString());
+    }
+    return DB::kOK;
   }
 
   int LevelDB::Delete(const std::string &table, const std::string &key){
-    std::vector<KVPair> values;
-    return Insert(table,key,values);
+    leveldb::Status s = db_->Delete(leveldb::WriteOptions(), key);
+    if (!s.ok()) {
+      LOGOUT(s.ToString());
+    }
+    return DB::kOK;
   }
 
   void LevelDB::printStats(){

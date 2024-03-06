@@ -25,15 +25,13 @@ namespace ycsbc {
       virtual bool DoTransaction();
 
       virtual ~Client() { }
-
-    protected:
-
+    
       virtual int TransactionRead();
       virtual int TransactionReadModifyWrite();
       virtual int TransactionScan();
       virtual int TransactionUpdate();
       virtual int TransactionInsert();
-
+      protected:
       std::shared_ptr<DB> db_;
       CoreWorkload &workload_;
   };

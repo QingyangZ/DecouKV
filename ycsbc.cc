@@ -28,6 +28,31 @@ using namespace std;
 void UsageMessage(const char *command);
 bool StrStartWith(const char *str, const char *pre);
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
+int ReadClient(shared_ptr<ycsbc::DB> db, ycsbc::CoreWorkload *wl, const int num_ops,
+    bool is_loading,shared_ptr<utils::Histogram> histogram, bool is_read) {
+  db->Init();
+  utils::Timer<utils::t_microseconds> timer;
+  ycsbc::Client client(db, *wl);
+  int oks = 0;
+  if (is_read) {
+    for (int i = 0; i < num_ops; ++i) {
+      timer.Start();
+      oks += client.TransactionRead();
+      double duration = timer.End();
+      histogram->Add_Fast(duration);
+    } 
+  } else {
+    for (int i = 0; i < num_ops; ++i) {
+      timer.Start();
+      oks += client.TransactionInsert();
+      double duration = timer.End();
+      histogram->Add_Fast(duration);
+    } 
+  }
+
+  db->Close();
+  return oks;
+}
 
 int DelegateClient(shared_ptr<ycsbc::DB> db, ycsbc::CoreWorkload *wl, const int num_ops,
     bool is_loading,shared_ptr<utils::Histogram> histogram) {
@@ -67,12 +92,12 @@ int main(const int argc, const char *argv[]) {
   vector<shared_ptr<utils::Histogram>> histogram_list;
   utils::Timer<utils::t_microseconds> timer;
 
-  int total_ops = 0;
+  long long int total_ops = 0;
   int sum = 0;
   if (props.GetProperty("skipload") != "true"){
     // Loads data
     timer.Start();
-    total_ops = stoi(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY]);
+    total_ops = stoll(props[ycsbc::CoreWorkload::RECORD_COUNT_PROPERTY]);
     for (int i = 0; i < num_threads; ++i) {
       auto histogram_tmp = make_shared<utils::Histogram>(utils::RecordUnit::h_microseconds);
       histogram_list.push_back(histogram_tmp);
@@ -98,18 +123,33 @@ int main(const int argc, const char *argv[]) {
   }else {
     cerr << "# Skipped load records!" << endl;
   }
-
+  
   // Peforms transactions
   actual_ops.clear();
   histogram_list.clear();
-  total_ops = stoi(props[ycsbc::CoreWorkload::OPERATION_COUNT_PROPERTY]);
+  total_ops = stoll(props[ycsbc::CoreWorkload::OPERATION_COUNT_PROPERTY]);
   timer.Start();
-  for (int i = 0; i < num_threads; ++i) {
-    auto histogram_tmp = make_shared<utils::Histogram>(utils::RecordUnit::h_microseconds);
-    histogram_list.push_back(histogram_tmp);
-    actual_ops.emplace_back(async(launch::async,
-          DelegateClient, db, &wl, total_ops / num_threads, false, histogram_tmp));
+  // rw client
+  if (0) {
+    for (int i = 0; i < num_threads; ++i) {
+      auto histogram_tmp = make_shared<utils::Histogram>(utils::RecordUnit::h_microseconds);
+      histogram_list.push_back(histogram_tmp);
+      if (i % 2 == 0) 
+        actual_ops.emplace_back(async(launch::async,
+              ReadClient, db, &wl, total_ops / num_threads, false, histogram_tmp, true));
+      else 
+        actual_ops.emplace_back(async(launch::async,
+            ReadClient, db, &wl, total_ops / num_threads, false, histogram_tmp, false));
+    }
+  } else {
+    for (int i = 0; i < num_threads; ++i) {
+      auto histogram_tmp = make_shared<utils::Histogram>(utils::RecordUnit::h_microseconds);
+      histogram_list.push_back(histogram_tmp);
+      actual_ops.emplace_back(async(launch::async,
+            DelegateClient, db, &wl, total_ops / num_threads, false, histogram_tmp));
+    }
   }
+    
   assert((int)actual_ops.size() == num_threads);
 
   sum = 0;
@@ -234,3 +274,6 @@ inline bool StrStartWith(const char *str, const char *pre) {
   return strncmp(str, pre, strlen(pre)) == 0;
 }
 
+void NewClient() {
+
+}
