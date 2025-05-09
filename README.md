@@ -37,8 +37,8 @@ $ sudo apt install libsnappy-dev libgflags-dev zlib1g-dev libbz2-dev liblz4-dev 
 
 Please edit the `test.sh` script before running.
 Specifically, modify line 7 and 8 to set the correct paths:
-    * Set `db_path` to the directory on your SSD (slow device)
-    * Set `pmem_path` to the directory on your PMEM (fast device)
+- Set `db_path` to the directory on your SSD (slow device)
+- Set `pmem_path` to the directory on your PMEM (fast device)
 
 2. **Run all benchmarks and generate CPU utilization plots**:
 
@@ -80,15 +80,15 @@ You can adjust the number of threads, selected systems, number of CPU cores, and
 
 * In the `workload/` directory:
 Each YCSB workload file can be modified to change parameters such as:
--Database size (recordcount)
--Number of operations (operationcount)
--Read/write ratio
--Key distribution (Uniform of Zipfian)
+- Database size (recordcount)
+- Number of operations (operationcount)
+- Read/write ratio
+- Key distribution (Uniform of Zipfian)
 
 * In `db_config.yaml`:
 System-level configurations can be customized, including:
--SSTable size
--MemTable size
--And other internal parameters
+- SSTable size
+- MemTable size
+- And other internal parameters
 
 These options provide flexibility to explore additional workloads or system behaviors beyond the default setup.
