@@ -80,10 +80,10 @@ You can adjust the number of threads, selected systems, number of CPU cores, and
 
 * In the `workload/` directory:
 Each YCSB workload file can be modified to change parameters such as:
-- Database size (recordcount)
-- Number of operations (operationcount)
-- Read/write ratio
-- Key distribution (Uniform of Zipfian)
+  - Database size (recordcount)
+  - Number of operations (operationcount)
+  - Read/write ratio
+  - Key distribution (Uniform of Zipfian)
 
 * In `db_config.yaml`:
 System-level configurations can be customized, including:
