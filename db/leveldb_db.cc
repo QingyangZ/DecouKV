@@ -35,15 +35,16 @@ namespace ycsbc {
     //create database if not exists
     options.create_if_missing = true;
     options.enable_direct_io = dc.enable_direct_io_;
-    options.enable_compaction = dc.enable_compaction_;
-    options.use_global_index = dc.use_global_index_;
-    options.use_queue_monitor = dc.use_queue_monitor_;
-    options.thread_compaction = dc.thread_compaction_;
+    // options.enable_compaction = dc.enable_compaction_;
+    // options.use_global_index = dc.use_global_index_;
+    // options.use_queue_monitor = dc.use_queue_monitor_;
+    // options.thread_compaction = dc.thread_compaction_;
     options.filter_policy = leveldb::NewBloomFilterPolicy(dc.bloom_bits_);
     options.block_cache = leveldb::NewLRUCache(dc.block_cache_size_);
     options.write_buffer_size = dc.memtable_size_;
-    options.max_file_size = dc.sst_file_size_;
-    leveldb::Status s = leveldb::DB::Open(options,dbfilename,&db_);
+    // options.max_file_size = dc.sst_file_size_;
+    const std::string dbname_mem = "/mnt/pmem0/zqy/ycsb/novelsm";
+    leveldb::Status s = leveldb::DB::Open(options,dbfilename, dbname_mem,&db_);
     if(!s.ok()){
       cerr << "init leveldb failed!"<<endl;
       exit(0);

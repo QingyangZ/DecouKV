@@ -8,6 +8,10 @@ project(ycsbc)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -pthread ")
 
+if(NOT DEFINED CMAKE_DB)
+    set(CMAKE_DB "rocksdb")  # default rocksdb
+endif()
+
 #4. head file path
 include_directories(
   ${PROJECT_SOURCE_DIR}
@@ -15,17 +19,52 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/core
   ${PROJECT_SOURCE_DIR}/third_party/yaml-cpp/include
   ${PROJECT_SOURCE_DIR}/third_party/googletest/googletest/include
-  ${PROJECT_SOURCE_DIR}/db_impl/leveldb/include
-  ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/include
+  ${PROJECT_SOURCE_DIR}/db_impl/lsm_nvm/include
+  # ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/include
+  # ${PROJECT_SOURCE_DIR}/db_impl/matrixkv/include
   )
 
 #5. third path link path
 link_directories(
   ${PROJECT_SOURCE_DIR}/third_party/yaml-cpp/build/
   ${PROJECT_SOURCE_DIR}/third_party/googletest/build/lib/
-  ${PROJECT_SOURCE_DIR}/db_impl/leveldb/build/
-  ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/build/
+  ${PROJECT_SOURCE_DIR}/db_impl/lsm_nvm/out-static/
+  # ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/build
+  # ${PROJECT_SOURCE_DIR}/db_impl/matrixkv
   )
+
+if(CMAKE_DB STREQUAL "RocksDB")
+  include_directories(
+    ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/include
+    )
+  link_directories(
+    ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/build
+    )
+elseif(CMAKE_DB STREQUAL "MatrixKV")
+  include_directories(
+    ${PROJECT_SOURCE_DIR}/db_impl/matrixkv/include
+    )
+  link_directories(
+    ${PROJECT_SOURCE_DIR}/db_impl/matrixkv
+    )
+  add_definitions(-DUSE_MATRIXKV)
+elseif(CMAKE_DB STREQUAL "ADOC")
+  include_directories(
+    ${PROJECT_SOURCE_DIR}/db_impl/adoc/include
+    )
+  link_directories(
+    ${PROJECT_SOURCE_DIR}/db_impl/adoc
+    )
+elseif(CMAKE_DB STREQUAL "DecouKV")
+  include_directories(
+    ${PROJECT_SOURCE_DIR}/db_impl/decoukv/include
+    )
+  link_directories(
+    ${PROJECT_SOURCE_DIR}/db_impl/decoukv/build
+    )
+else()
+  message(FATAL_ERROR "Unsupported DB type: ${CMAKE_DB}")
+endif()
 
 #6. source code file path
 file(GLOB MAIN_FILE
@@ -50,6 +89,10 @@ target_link_libraries(${PROJECT_NAME}
   bz2
   z
   dl
+  numa
+  stdc++
+  pmem
+  uring
   )
 
 #8. define gtest path
@@ -73,6 +116,15 @@ if (GTEST_FOUND)
       rocksdb
       pthread
       snappy
+      numa
+      zstd
+      lz4
+      bz2
+      z
+      dl
+      stdc++
+      pmem
+      uring
       )
     add_test(NAME ${testname} COMMAND ${testname})
   ENDFOREACH(testsourcefile ${TEST_FILE})
