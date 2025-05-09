@@ -15,6 +15,7 @@
 #include <iostream>
 #include <vector>
 #include <future>
+#include <atomic>
 #include "core/utils.h"
 #include "core/timer.h"
 #include "core/client.h"
@@ -27,6 +28,24 @@ using namespace std;
 
 void UsageMessage(const char *command);
 bool StrStartWith(const char *str, const char *pre);
+std::atomic<int> cnt(0);
+// 标志变量，用于控制线程停止
+std::atomic<bool> stop_thread(false);
+int timer_count = 0;
+// 计数线程：每秒输出一次count的值并清零
+void print_and_reset_count() {
+  while (!stop_thread.load()) {
+    // 每秒输出一次
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    
+    // 输出 count 的值
+    std::cout << timer_count++ << ' ' << cnt.load() << std::endl;
+
+    // 清零 count
+    cnt.store(0);
+  }
+}
+
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props);
 int ReadClient(shared_ptr<ycsbc::DB> db, ycsbc::CoreWorkload *wl, const int num_ops,
     bool is_loading,shared_ptr<utils::Histogram> histogram, bool is_read) {
@@ -69,6 +88,7 @@ int DelegateClient(shared_ptr<ycsbc::DB> db, ycsbc::CoreWorkload *wl, const int 
     }
     double duration = timer.End();
     histogram->Add_Fast(duration);
+    cnt.fetch_add(1, std::memory_order_relaxed);  // 原子加1
   }
   db->Close();
   return oks;
@@ -91,6 +111,8 @@ int main(const int argc, const char *argv[]) {
   vector<future<int>> actual_ops;
   vector<shared_ptr<utils::Histogram>> histogram_list;
   utils::Timer<utils::t_microseconds> timer;
+  // 启动计数和输出线程
+  // std::thread printer(print_and_reset_count);
 
   long long int total_ops = 0;
   int sum = 0;
@@ -118,7 +140,7 @@ int main(const int argc, const char *argv[]) {
     }
     cerr << "# Loading records:\t" << sum << endl;
     cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t';
-    cerr << total_ops / (duration/ histogram.GetRecordUnit()) << " OPS" << endl;
+    cerr << "Throughput: " << total_ops / (duration / histogram.GetRecordUnit()) << " OPS" << endl;
     cerr << histogram.ToString() << endl;
   }else {
     cerr << "# Skipped load records!" << endl;
@@ -151,7 +173,7 @@ int main(const int argc, const char *argv[]) {
   }
     
   assert((int)actual_ops.size() == num_threads);
-
+  
   sum = 0;
   for (auto &n : actual_ops) {
     assert(n.valid());
@@ -161,12 +183,14 @@ int main(const int argc, const char *argv[]) {
   for (auto &h : histogram_list){
     histogram.Merge( *h );
   }
-
+  // 设置停止标志
+  // stop_thread.store(true);
   auto duration = timer.End();
   cerr << "# Transaction throughput (KTPS)" << endl;
   cerr << props["dbname"] << '\t' << file_name << '\t' << num_threads << '\t';
-  cerr << total_ops / (duration / histogram.GetRecordUnit()) << " OPS" << endl;
+  cerr << "Throughput: " << total_ops / (duration / histogram.GetRecordUnit()) << " OPS" << endl;
   cerr << histogram.ToString() << endl;
+  stop_thread.store(true);
 }
 
 string ParseCommandLine(int argc, const char *argv[], utils::Properties &props) {

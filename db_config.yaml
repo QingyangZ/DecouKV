@@ -1,20 +1,20 @@
 leveldb:
   bloom_bits: 10
-  enable_direct_io: false
+  enable_direct_io: true
   enable_compaction: true
   use_global_index: false
   use_queue_monitor: false
-  thread_compaction: 16
-  block_cache_size: "20GB" # e.g. "100MB" or "10GB"
+  thread_compaction: 4
+  block_cache_size: "1GB" # e.g. "100MB" or "10GB"
   memtable_size: "64MB" # e.g. "64MB"
   sst_file_size: "32MB"
 rocksdb:
   bloom_bits: 10
-  enable_direct_io: false
+  enable_direct_io: true
   enable_compaction: true
   use_global_index: false
-  use_queue_monitor: true
-  thread_compaction: 1
-  block_cache_size: "10GB" # e.g. "100MB" or "10GB"
-  memtable_size: "128MB" # e.g. "64MB"
+  use_queue_monitor: false
+  thread_compaction: 4
+  block_cache_size: "1GB" # e.g. "100MB" or "10GB"
+  memtable_size: "64MB" # e.g. "64MB"
   sst_file_size: "64MB"
