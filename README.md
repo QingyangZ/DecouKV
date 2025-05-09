@@ -68,7 +68,7 @@ Reducing the data volume (default: 100GB) can shorten the runtime, but may affec
 5. **Clean Up Experimental Data and Build Files**
 
 ```bash
-./clean.sh      # Generates Figure 13
+./clean.sh 
 ```
 
 ## Running Other Experiments
