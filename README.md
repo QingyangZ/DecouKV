@@ -65,34 +65,32 @@ Reducing the data volume (default: 100GB) can shorten the runtime, but may affec
 ./draw_latency.sh      # Generates Figure 13
 ```
 
-To build third-party and db imples
-```
-$ cd third-party && ./build_third_party.sh
-$ cd db_impl && ./build_db_impl.sh
+5. **Clean Up Experimental Data and Build Files**
+
+```bash
+./clean.sh      # Generates Figure 13
 ```
 
-To build YCSB-C on Ubuntu, for example:
+## Running Other Experiments
 
-```
-$ mkdir -p build && cd build
-$ cmake -DCMAKE_BUILD_TYPE=Release ..
-$ cmake --build . -j
-```
+Other experiments in the paper can be reproduced by modifying the following parameters:
 
-To run test:
+* In `test.sh`:
+You can adjust the number of threads, selected systems, number of CPU cores, and the YCSB workloads to run.
 
-```
-$ cd build && ctest
-```
+* In the `workload/` directory:
+Each YCSB workload file can be modified to change parameters such as:
 
-Run Workload A with a leveldb
-implementation of the database, for example:
-```
-$ cd build
-$ ./ycsbc -db leveldb -dbpath . -P ../workloads/workloada.spec -threads 4
-```
+-Database size (recordcount)
+-Number of operations (operationcount)
+-Read/write ratio
+-Key distribution (Uniform of Zipfian)
 
-Note that we do not have load and run commands as the original YCSB. Specify
-how many records to load by the recordcount property. Reference properties
-files in the workloads dir.
+* In `db_config.yaml`:
+System-level configurations can be customized, including:
 
+-SSTable size
+-MemTable size
+-And other internal parameters
+
+These options provide flexibility to explore additional workloads or system behaviors beyond the default setup.
