@@ -4,7 +4,7 @@ threads_num=64
 systems=("RocksDB" "MatrixKV" "ADOC" "DecouKV")
 core_num=8
 # ycsb_workload="workloada" # workloada, workloadb, workloadc, workloadd, workloade, workloadf
-db_path="/mnt/sdc/zqy/test_data" # test data directory
+db_path="/mnt/sdc/zqy/test_data" # SSD directory
 pmem_path="/mnt/pmem0/test" # pmem path
 workloads=("workloada" "workloadb" "workloadc" "workloadd" "workloade" "workloadf")
 
