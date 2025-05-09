@@ -46,9 +46,11 @@ Specifically, modify line 7 and 8 to set the correct paths:
 nohup ./test.sh > test.log 2>&1 &
 ```
 This will:
-- Compile all four systems
-- Run **Load**, **YCSB-A to F** workloads
-- Output CPU utilization fluctuation plot (Figure 11) into `./test_results/`
+    - Compile all four systems
+
+    - Run **Load**, **YCSB-A to F** workloads
+
+    - Output CPU utilization fluctuation plot (Figure 11) into `./test_results/`
 
 This step may take over 24 hours to complete. You can monitor the script’s progress in the test.log file.
 Reducing the data volume (default: 100GB) can shorten the runtime, but may affect the final results.
@@ -81,21 +83,21 @@ You can adjust the number of threads, selected systems, number of CPU cores, and
 * In the `workload/` directory:
 Each YCSB workload file can be modified to change parameters such as:
 
--Database size (recordcount)
+    -Database size (recordcount)
 
--Number of operations (operationcount)
+    -Number of operations (operationcount)
 
--Read/write ratio
+    -Read/write ratio
 
--Key distribution (Uniform of Zipfian)
+    -Key distribution (Uniform of Zipfian)
 
 * In `db_config.yaml`:
 System-level configurations can be customized, including:
 
--SSTable size
+    -SSTable size
 
--MemTable size
+    -MemTable size
 
--And other internal parameters
+    -And other internal parameters
 
 These options provide flexibility to explore additional workloads or system behaviors beyond the default setup.
