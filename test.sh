@@ -13,13 +13,16 @@ latency_file="./test_results/ycsb_latency.csv"
 echo "Sys,Load,A,B,C,D,E,F" > "$throughput_file"
 echo "Sys,Load,A,B,C,D,E,F" > "$latency_file"
 
+mkdir -p build
 for test_db in "${systems[@]}"
 do
   if [ "$test_db" = "RocksDB" ]; then
+    mkdir -p ./db_impl/rocksdb/build
     cd ./db_impl/rocksdb/build
     cmake -DCMAKE_BUILD_TYPE=Release .. && make -j 32
     cd ../../../build
   elif [ "$test_db" = "DecouKV" ]; then
+    mkdir -p ./db_impl/decoukv/build
     cd ./db_impl/decoukv/build
     cmake -DCMAKE_BUILD_TYPE=Release .. && make -j 32
     cd ../../../build
