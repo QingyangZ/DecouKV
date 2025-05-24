@@ -44,7 +44,7 @@ namespace ycsbc {
     options.write_buffer_size = dc.memtable_size_;
     // options.max_file_size = dc.sst_file_size_;
     const std::string dbname_mem = "/mnt/pmem0/zqy/ycsb/novelsm";
-    leveldb::Status s = leveldb::DB::Open(options,dbfilename, dbname_mem,&db_);
+    leveldb::Status s = leveldb::DB::Open(options,dbfilename,&db_);
     if(!s.ok()){
       cerr << "init leveldb failed!"<<endl;
       exit(0);

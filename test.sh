@@ -14,6 +14,11 @@ latency_file="./test_results/ycsb_latency.csv"
 echo "Sys,Load,A,B,C,D,E,F" > "$throughput_file"
 echo "Sys,Load,A,B,C,D,E,F" > "$latency_file"
 
+cd ./db_impl/leveldb0
+mkdir -p build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release .. && make -j 32
+cd ../../..
+
 mkdir -p build
 for test_db in "${systems[@]}"
 do

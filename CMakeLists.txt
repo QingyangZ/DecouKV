@@ -19,7 +19,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/core
   ${PROJECT_SOURCE_DIR}/third_party/yaml-cpp/include
   ${PROJECT_SOURCE_DIR}/third_party/googletest/googletest/include
-  ${PROJECT_SOURCE_DIR}/db_impl/lsm_nvm/include
+  ${PROJECT_SOURCE_DIR}/db_impl/leveldb0/include
   # ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/include
   # ${PROJECT_SOURCE_DIR}/db_impl/matrixkv/include
   )
@@ -28,7 +28,7 @@ include_directories(
 link_directories(
   ${PROJECT_SOURCE_DIR}/third_party/yaml-cpp/build/
   ${PROJECT_SOURCE_DIR}/third_party/googletest/build/lib/
-  ${PROJECT_SOURCE_DIR}/db_impl/lsm_nvm/out-static/
+  ${PROJECT_SOURCE_DIR}/db_impl/leveldb0/build/
   # ${PROJECT_SOURCE_DIR}/db_impl/rocksdb/build
   # ${PROJECT_SOURCE_DIR}/db_impl/matrixkv
   )
@@ -93,6 +93,7 @@ target_link_libraries(${PROJECT_NAME}
   stdc++
   pmem
   uring
+  crc32c
   )
 
 #8. define gtest path
@@ -125,6 +126,7 @@ if (GTEST_FOUND)
       stdc++
       pmem
       uring
+      crc32c
       )
     add_test(NAME ${testname} COMMAND ${testname})
   ENDFOREACH(testsourcefile ${TEST_FILE})
