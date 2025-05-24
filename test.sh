@@ -8,6 +8,7 @@ db_path="/mnt/sdc/zqy/test_data" # SSD directory
 pmem_path="/mnt/pmem0/test" # pmem path
 workloads=("workloada" "workloadb" "workloadc" "workloadd" "workloade" "workloadf")
 
+mkdir -p ./test_results
 throughput_file="./test_results/ycsb_throughput.csv"
 latency_file="./test_results/ycsb_latency.csv"
 echo "Sys,Load,A,B,C,D,E,F" > "$throughput_file"
