@@ -1,0 +1,38 @@
+DestroyDB soptions.nvm_setup==nullptr
+use_nvm_module:1 pmem_path:/mnt/pmem0/tht/matrixkv_db write_buffer_size:64.000000 MB 
+             Level0_column_compaction_trigger_size:3072.000000 MB  
+             Level0_column_compaction_slowdown_size:3584.000000 MB  
+             Level0_column_compaction_stop_size:4096.000000 MB  
+             Column_compaction_no_L1_select_L0:4 
+             Column_compaction_have_L1_select_L0:2 
+             level0_stop_writes_trigger:36 target_file_size_base:64.000000 MB
+use_nvm_module:1 pmem_path:/mnt/pmem0/tht/matrixkv_db write_buffer_size:64.000000 MB 
+             Level0_column_compaction_trigger_size:3072.000000 MB  
+             Level0_column_compaction_slowdown_size:3584.000000 MB  
+             Level0_column_compaction_stop_size:4096.000000 MB  
+             Column_compaction_no_L1_select_L0:4 
+             Column_compaction_have_L1_select_L0:2 
+             level0_stop_writes_trigger:36 target_file_size_base:64.000000 MB
+open PersistentSstable path:/mnt/pmem0/tht/matrixkv_db/cf_0_default_sstable.pool map_len:9360.000000 MB is:1 each_size:72.000000 MB number:130 total_size:9360.000000 MB
+creat SstableMetadata
+compaction_num:0 pick_compaction_time:0 l0_get_time:0 l0_find_num:0
+NvmCfModule:close
+DestroyDB delete dir:/mnt/pmem0/tht/matrixkv_db
+DestroyDB delete file:/mnt/pmem0/tht/matrixkv_db/cf_0_default_sstable.pool
+DestroyDB delete file:/mnt/pmem0/tht/matrixkv_db/009082.log
+use_nvm_module:1 pmem_path:/mnt/pmem0/tht/matrixkv_db write_buffer_size:64.000000 MB 
+             Level0_column_compaction_trigger_size:3072.000000 MB  
+             Level0_column_compaction_slowdown_size:3584.000000 MB  
+             Level0_column_compaction_stop_size:4096.000000 MB  
+             Column_compaction_no_L1_select_L0:4 
+             Column_compaction_have_L1_select_L0:2 
+             level0_stop_writes_trigger:36 target_file_size_base:64.000000 MB
+use_nvm_module:1 pmem_path:/mnt/pmem0/tht/matrixkv_db write_buffer_size:64.000000 MB 
+             Level0_column_compaction_trigger_size:3072.000000 MB  
+             Level0_column_compaction_slowdown_size:3584.000000 MB  
+             Level0_column_compaction_stop_size:4096.000000 MB  
+             Column_compaction_no_L1_select_L0:4 
+             Column_compaction_have_L1_select_L0:2 
+             level0_stop_writes_trigger:36 target_file_size_base:64.000000 MB
+crest PersistentSstable path:/mnt/pmem0/tht/matrixkv_db/cf_0_default_sstable.pool map_len:9360.000000 MB is:1 each_size:72.000000 MB number:130 total_size:9360.000000 MB
+creat SstableMetadata

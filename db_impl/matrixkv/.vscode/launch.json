@@ -1,0 +1,51 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "g++ - 生成和调试活动文件",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/mnt//mnt/sde/zqy/data/matrixkv/tht/MatrixKV/db_bench",
+            // "args": [
+            //     "-db", "rocksdb",
+            //     "-dbpath", "/mnt//mnt/sde/zqy/data/matrixkv/tht/matrixkv_db",
+            //     "-P", "../workloads/workloada.spec",
+            //     "-threads", "32",
+            //     "-skipload", "false"
+            // ],
+            // "program": "${workspaceFolder}/db_impl/rocksdb/build/db_bench",
+            "args": [
+                "--benchmarks=\"fillrandom,stats\"",
+                "--num=1000000",
+                //"--reads=10000000",
+                "--db=\"/mnt//mnt/sde/zqy/data/matrixkv/tht/matrixkv_db\"",
+                "--cache_size=10485760",
+                // "--cache_size=0",
+                "--open_files=10000",
+                "--bloom_bits=10",
+                "--threads=16",
+                "--pmem_path=\"/mnt/pmem0/tht/matrixkv_db\"",
+                "--use_nvm_module=\"true\""
+                //"--use_existing_db=0",
+                // "--enable_compaction=1"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "C/C++: g++ 生成活动文件",
+            "miDebuggerPath": "/usr/bin/gdb"
+        }
+    ]
+}
